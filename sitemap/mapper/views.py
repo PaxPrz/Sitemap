@@ -1,8 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import redirect
 
 from .models import Site, Sitemap, Vulnerability
 from .forms import SiteFormset, SiteForm
@@ -36,6 +35,8 @@ class Sites(ListView):
                 nform.save()
             except ObjectDoesNotExist:
                 form.save()
+        else:
+            return render(self.request, 'mapper/SitesListView.html', {'form':form, 'sites':Site.objects.all()})
         return redirect('mapper:sites')
             
 

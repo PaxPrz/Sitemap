@@ -5,8 +5,43 @@ Sites
 {% endblock title %}
 
 {% block content %}
+
+<style>
+ /* The alert message box */
+.alert {
+  padding: 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  margin-bottom: 15px;
+}
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+} 
+</style>
+
 <h1>Sites</h1>
 <hr/>
+{% if form.errors %}
+  <div class="alert">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    {{form.errors}}
+  </div> 
+{% endif %}
+
 <table class="table">
   <thead class="thead-dark">
     <tr>
@@ -33,30 +68,15 @@ Sites
         <th scope="row"></th>
 
         <td>
-        <div class="blocker"></div>
-        <div id="site_name_error">
-          <div id="form_site_name">{{form.site_name.errors}}naem</div>
-        </div>
         {{form.site_name}}
-        <div class="blocker"></div>
         </td>
         
         <td>
-        <div class="blocker"></div>
-        <div id="site_location_error">
-          <div id="form_site_location">{{form.site_location.errors}}loc</div>
-        </div>
         {{form.site_location}}
-        <div class="blocker"></div>
         </td>
 
         <td>
-        <div class="blocker"></div>
-        <div id="is_active_error">
-          <div id="form_is_active">{{form.is_active.errors}}act</div>
-        </div>
         {{form.is_active}}
-        <div class="blocker"></div>
         </td>
 
         <td><button type="submit">Create</button></td>
@@ -65,7 +85,7 @@ Sites
   </tbody>
 </table>
 
-<script>
+{% comment %} <script>
   var site_name_error = $('#site_name_error');
   var site_location_error = $('#site_location_error');
   var is_active_error = $('#is_active_error');
@@ -101,7 +121,7 @@ Sites
       }))
     }
   }
-</script>
+</script> {% endcomment %}
 
 {% comment %} <form class="form-horizontal" method="POST" action="">
   {% csrf_token %}
