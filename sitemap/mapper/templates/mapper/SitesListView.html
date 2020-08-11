@@ -1,1 +1,199 @@
 {% extends 'sitemap/base.html' %}
+
+{% block title %}
+Sites
+{% endblock title %}
+
+{% block content %}
+<h1>Sites</h1>
+<hr/>
+<table class="table">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Sitename</th>
+      <th scope="col">Site Location</th>
+      <th scope="col">Active</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in sites %}
+      <tr>
+        <th scope="row">{{s.id}}</th>
+        <td>{{s.site_name}}</td>
+        <td>{{s.site_location}}</td>
+        <td>{{s.is_active}}</td>
+        <td><button onclick="confirm('Do you want to delete {{s.site_name}}?');">Delete</button></td>
+      </tr>
+    {% endfor %}
+    <form method="POST" action=".">
+      {% csrf_token %}
+      <tr>
+        <th scope="row"></th>
+
+        <td>
+        <div class="blocker"></div>
+        <div id="site_name_error">
+          <div id="form_site_name">{{form.site_name.errors}}naem</div>
+        </div>
+        {{form.site_name}}
+        <div class="blocker"></div>
+        </td>
+        
+        <td>
+        <div class="blocker"></div>
+        <div id="site_location_error">
+          <div id="form_site_location">{{form.site_location.errors}}loc</div>
+        </div>
+        {{form.site_location}}
+        <div class="blocker"></div>
+        </td>
+
+        <td>
+        <div class="blocker"></div>
+        <div id="is_active_error">
+          <div id="form_is_active">{{form.is_active.errors}}act</div>
+        </div>
+        {{form.is_active}}
+        <div class="blocker"></div>
+        </td>
+
+        <td><button type="submit">Create</button></td>
+      </tr>
+    </form>
+  </tbody>
+</table>
+
+<script>
+  var site_name_error = $('#site_name_error');
+  var site_location_error = $('#site_location_error');
+  var is_active_error = $('#is_active_error');
+  site_name_error.hide();
+  site_location_error.hide();
+  is_active_error.hide();
+  var site_name_error_string = "{{ form.site_name.error }}";
+  var site_location_error_string = "{{ form.site_location.error }}";
+  var is_active_error_string = "{{ form.is_active.error }}";
+  var div_list = [site_name_error, site_location_error, is_active_error];
+  var string_list = [site_name_error_string, site_location_error_string, is_active_error_string];
+  console.log(string_list);
+  var reference_list = [$('#form_site_name'), $('#form_site_location'), $('#form_is_active')];
+  var popper_list = [];
+  var i=0;
+  for (i=0; i<div_list.length; i++){
+    if (string_list[i].length >= 0){
+      div_list[i].show();
+      popper_list.push(new Popper(reference_list[i], div_list[i], {
+        placement: 'top',
+        onCreate: function(data){
+          console.log(data);
+        },
+        modifiers:{
+          flip:{
+            behaviour:['left', 'right', 'top', 'bottom']
+          },
+          offset: {
+            enabled: true,
+            offset: '0,10'
+          }
+        }
+      }))
+    }
+  }
+</script>
+
+{% comment %} <form class="form-horizontal" method="POST" action="">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  {% for form in formset %}
+    <div class="row form-row spacer">
+      <div class="col-sm-2">
+        <label>{{form.site_name.label}}</label>
+      </div>
+      <div class="col-8">
+        <div class="input-group">
+          {{form.site_name}}
+          {{form.site_location}}
+          {{form.is_active}}
+          <div class="input-group=append">
+            <button class="btn btn-success add-form-row">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  <div class="row" style="margin:10px;"></div>
+  <div class="row spacer">
+    <div class="col-4 offset-4">
+      <button type="submit" class="btn btn-block btn-primary">Create</button>
+    </div>
+  </div>
+</form> {% endcomment %}
+
+
+{% comment %} <script type="text/javascript">
+function updateElementIndex(el, prefix, ndx) {
+    var id_regex = new RegExp('(' + prefix + '-\\d+)');
+    var replacement = prefix + '-' + ndx;
+    if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
+    if (el.id) el.id = el.id.replace(id_regex, replacement);
+    if (el.name) el.name = el.name.replace(id_regex, replacement);
+}
+function cloneMore(selector, prefix) {
+    var newElement = $(selector).clone(true);
+    var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
+    newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
+        var name = $(this).attr('name')
+        if(name) {
+            name = name.replace('-' + (total-1) + '-', '-' + total + '-');
+            var id = 'id_' + name;
+            $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+        }
+    });
+    newElement.find('label').each(function() {
+        var forValue = $(this).attr('for');
+        if (forValue) {
+          forValue = forValue.replace('-' + (total-1) + '-', '-' + total + '-');
+          $(this).attr({'for': forValue});
+        }
+    });
+    total++;
+    $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+    $(selector).after(newElement);
+    var conditionRow = $('.form-row:not(:last)');
+    conditionRow.find('.btn.add-form-row')
+    .removeClass('btn-success').addClass('btn-danger')
+    .removeClass('add-form-row').addClass('remove-form-row')
+    .html('-');
+    return false;
+}
+function deleteForm(prefix, btn) {
+    var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+    if (total > 1){
+        btn.closest('.form-row').remove();
+        var forms = $('.form-row');
+        $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);
+        for (var i=0, formCount=forms.length; i<formCount; i++) {
+            $(forms.get(i)).find(':input').each(function() {
+                updateElementIndex(this, prefix, i);
+            });
+        }
+    }
+    return false;
+}
+$(document).on('click', '.add-form-row', function(e){
+    e.preventDefault();
+    cloneMore('.form-row:last', 'form');
+    return false;
+});
+$(document).on('click', '.remove-form-row', function(e){
+    e.preventDefault();
+    deleteForm('form', $(this));
+    return false;
+});
+
+</script> {% endcomment %}
+
+
+{% endblock content %}
