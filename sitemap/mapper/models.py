@@ -18,10 +18,10 @@ class Site(models.Model):
 class Sitemap(models.Model):
     element = models.CharField(max_length=50)
     location = models.URLField(max_length=200)
-    parent = models.ForeignKey("Sitemap", on_delete=models.CASCADE)
+    parent = models.ForeignKey("Sitemap", on_delete=models.CASCADE, null=True)
     require_login = models.BooleanField(default=False)
     site = models.ForeignKey(Site, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=500)
+    comment = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return self.element
