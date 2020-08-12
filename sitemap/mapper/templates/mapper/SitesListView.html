@@ -14,7 +14,22 @@ Sites
   color: white;
   margin-bottom: 15px;
 }
+a {
+  color:#343a40;
+}
+.btn {
+  background-color: #343a40;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
 
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: red;
+}
 /* The close button */
 .closebtn {
   margin-left: 15px;
@@ -45,10 +60,10 @@ Sites
 <table class="table">
   <thead class="thead-dark">
     <tr>
-      <th scope="col">#</th>
+      <th scope="col">S.N.</th>
       <th scope="col">Sitename</th>
       <th scope="col">Site Location</th>
-      <th scope="col">Active</th>
+      <th scope="col">Status</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
@@ -57,9 +72,14 @@ Sites
       <tr>
         <th scope="row">{{s.id}}</th>
         <td>{{s.site_name}}</td>
-        <td>{{s.site_location}}</td>
-        <td>{{s.is_active}}</td>
-        <td><button onclick="confirm('Do you want to delete {{s.site_name}}?');">Delete</button></td>
+        <td><a href={{s.site_location}}>{{s.site_location}}</a></td>
+        <td> {% if s.is_active == True %}
+                  <span style="color:green"> <i class="fa fa-font-awesome" style="color:green"></i> Alive </span>
+             {% else %}
+                  <span style="color:red"> <i class='fas fa-exclamation-triangle'></i> Down </span>
+             {% endif %} </td>
+        <td><button class="btn" onclick="confirm('Do you want to delete {{s.site_name}}?');"> <i class="fa fa-trash"></i>
+        </button></td>
       </tr>
     {% endfor %}
     <form method="POST" action=".">
@@ -79,7 +99,7 @@ Sites
         {{form.is_active}}
         </td>
 
-        <td><button type="submit">Create</button></td>
+        <td><button class="btn" type="submit"><i class="fa fa-plus"></i></button></td>
       </tr>
     </form>
   </tbody>
