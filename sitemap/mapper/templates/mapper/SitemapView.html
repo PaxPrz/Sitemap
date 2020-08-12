@@ -1,0 +1,24 @@
+{% extends 'sitemap/base.html' %}
+
+{% load myfilters %}
+
+{% block title %}{{site_name}}
+{% endblock title %}
+
+{% block content %}
+
+<h1>Sitemap for {{site_name}}</h1>
+<hr/>
+
+{% for ele in eleList %}
+    {% if ele.1 != 0 %}
+        {% for i in ele.1|rangelt1 %}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        {% endfor %}
+        |--->
+    {% endif %}
+    {{ele.0.element}}
+    <br>
+{% endfor %}
+
+{% endblock content %}

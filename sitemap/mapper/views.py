@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist
@@ -34,11 +34,33 @@ class Sites(ListView):
                 nform = SiteForm(self.request.POST, instance=q)
                 nform.save()
             except ObjectDoesNotExist:
-                form.save()
+                m = form.save()
+                rootEle = Sitemap.objects.create(element='/', location=m.site_location, site=m)
         else:
             return render(self.request, 'mapper/SitesListView.html', {'form':form, 'sites':Site.objects.all()})
         return redirect('mapper:sites')
             
+
+def findSubEle(ele):
+    eleList=[(ele, 0)]
+    i=0
+    while i < len(eleList):
+        prev_indent = eleList[i][1]
+        for ele in reversed(eleList[i][0].sitemap_set.all()):
+            eleList.insert(i+1, (ele, prev_indent+1))
+        i+=1
+    return eleList
+
+def sitemap_view(request, slug):
+    site = get_object_or_404(Site, slug=slug)
+    rootEle = get_object_or_404(Sitemap, element='/', site=site)
+    print('Went inside')
+    eleList=findSubEle(rootEle)
+    print('=============================')
+    print(eleList)
+    print('=============================')
+    return render(request, 'mapper/SitemapView.html', {'eleList':eleList, 'site_name':site.site_name})
+
 
 
     
