@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import Site, Sitemap, Vulnerability
 from .forms import SiteFormset, SiteForm
+
 
 # Create your views here.
 class Sites(ListView):
@@ -59,9 +61,12 @@ def sitemap_view(request, slug):
     print('=============================')
     print(eleList)
     print('=============================')
-    return render(request, 'mapper/SitemapView.html', {'eleList':eleList, 'site_name':site.site_name})
+    return render(request, 'mapper/SitemapView.html', {'eleList':eleList, 'site':site})
 
-
-
-    
-    
+@csrf_exempt
+def delete_site(request):
+    if request.method == "POST":
+        pid = request.POST.get('pk')
+        site = get_object_or_404(Site, pk=pid)
+        site.delete()
+        return redirect('mapper:sites')

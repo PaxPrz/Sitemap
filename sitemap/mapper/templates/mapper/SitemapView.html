@@ -2,13 +2,62 @@
 
 {% load myfilters %}
 
-{% block title %}{{site_name}}
+{% block title %}{{site.site_name}}
 {% endblock title %}
 
 {% block content %}
 
-<h1>Sitemap for {{site_name}}</h1>
+<style>
+a {
+  color:#343a40;
+}
+.btn {
+  background-color: #343a40;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: red;
+}
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
+}
+
+.smallbtn{
+    width: 10px;
+    height: 10px;
+}
+</style>
+
+<h1>Sitemap for {{site.site_name}}</h1>
 <hr/>
+
+<div class="container">
+{% for ele in eleList %}
+    <div class="row">
+        <div class="col-sm-{{ele.1}}"></div><a href="{{ele.0.location}}" style="line-height:40px; font-size:20px; padding-right:10px;">{{ele.0.element}}</a> <button class="btn" type="submit"><i class="fa fa-plus smallbtn"></i></button>
+    </div>
+{% endfor %}
+</div>
+
 
 {% for ele in eleList %}
     {% if ele.1 != 0 %}

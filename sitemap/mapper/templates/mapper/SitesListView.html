@@ -70,7 +70,7 @@ a {
   <tbody>
     {% for s in sites %}
       <tr>
-        <th scope="row">{{s.id}}</th>
+        <th scope="row">{{forloop.counter}}</th>
         <td>{{s.site_name}}</td>
         <td><a href={{s.site_location}}>{{s.site_location}}</a></td>
         <td> {% if s.is_active == True %}
@@ -78,7 +78,7 @@ a {
              {% else %}
                   <span style="color:red"> <i class='fas fa-exclamation-triangle'></i> Down </span>
              {% endif %} </td>
-        <td><button class="btn" onclick="confirm('Do you want to delete {{s.site_name}}?');"> <i class="fa fa-trash"></i>
+        <td><button id="{{s.site_name}}-delete-btn" class="btn" onclick="delete_site({{s.id}});"> <i class="fa fa-trash"></i>
         </button></td>
       </tr>
     {% endfor %}
@@ -104,6 +104,31 @@ a {
     </form>
   </tbody>
 </table>
+
+<script>
+  function delete_site(site){
+    console.log("Deletesite called!");
+    var c = confirm('Do you want to delete site?');
+    console.log(site);
+    if (c==true){
+      console.log("i am inside");
+      //$(`<form action="delete_site/" method="POST">
+      //    <input type="hidden" name="pk" value="`+String(site)+`"/>
+      //  </form>
+      //`).submit();
+      var myForm = document.createElement("form");
+      myForm.method = "POST";
+      myForm.action = "delete_site/";
+      myInput = document.createElement("input");
+      myInput.setAttribute("name", "pk");
+      myInput.setAttribute("value", site);
+      myForm.appendChild(myInput);
+      document.body.appendChild(myForm);
+      myForm.submit();
+      document.body.removeChild(myForm);
+    }
+  }
+</script>
 
 {% comment %} <script>
   var site_name_error = $('#site_name_error');
