@@ -1,0 +1,4 @@
+bin/
+include/
+lib/
+sitemap/db.sqlite3
