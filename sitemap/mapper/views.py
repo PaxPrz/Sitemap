@@ -78,7 +78,7 @@ def addSitemap(request, slug):
         element = request.POST.get('element')
         location = request.POST.get('location')
         parent = get_object_or_404(Sitemap, pk=int(request.POST.get('parent')))
-        requireLogin = True if "on" in request.POST.get('requireLogin') else False
+        requireLogin = True if request.POST.get('requireLogin')!=None else False
         comment = request.POST.get('comment')
 
         Sitemap.objects.create(element=element, location=location, parent=parent, require_login=requireLogin, site=site, comment=comment)
