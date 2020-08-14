@@ -70,3 +70,17 @@ def delete_site(request):
         site = get_object_or_404(Site, pk=pid)
         site.delete()
         return redirect('mapper:sites')
+
+@csrf_exempt
+def addSitemap(request, slug):
+    if request.method == "POST":
+        site = get_object_or_404(Site, slug=slug)
+        element = request.POST.get('element')
+        location = request.POST.get('location')
+        parent = get_object_or_404(Sitemap, pk=int(request.POST.get('parent')))
+        requireLogin = True if "on" in request.POST.get('requireLogin') else False
+        comment = request.POST.get('comment')
+
+        Sitemap.objects.create(element=element, location=location, parent=parent, require_login=requireLogin, site=site, comment=comment)
+
+        return redirect('mapper:sitemap', slug=slug)

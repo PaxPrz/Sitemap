@@ -15,15 +15,12 @@ a {
   background-color: #343a40;
   border: none;
   color: white;
-  padding: 8px 12px;
+  padding: 2px 8px;
   font-size: 12px;
   cursor: pointer;
+  margin: 0px 5px;
 }
 
-/* Darker background on mouse-over */
-.btn:hover {
-  background-color: red;
-}
 /* The close button */
 .closebtn {
   margin-left: 15px;
@@ -36,14 +33,76 @@ a {
   transition: 0.3s;
 }
 
-/* When moving the mouse over the close button */
-.closebtn:hover {
-  color: black;
+.green{
 }
 
-.smallbtn{
-    width: 10px;
-    height: 10px;
+.green:hover{
+    background-color:green;
+}
+
+.red{
+}
+
+.red:hover{
+    background-color:red;
+}
+
+.setline{
+    line-height: 30px;
+    margin: 4px 0px;
+}
+
+.setline:hover{
+    background: #DDD;
+}
+
+.options{
+    display: none;
+}
+
+.setline:hover .options{
+    display:block;
+}
+</style>
+
+<style>
+/* The Modal (background) */
+.modal {
+  display: block; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
 }
 </style>
 
@@ -52,8 +111,19 @@ a {
 
 <div class="container">
 {% for ele in eleList %}
-    <div class="row">
-        <div class="col-sm-{{ele.1}}"></div><a href="{{ele.0.location}}" style="line-height:40px; font-size:20px; padding-right:10px;">{{ele.0.element}}</a> <button class="btn" type="submit"><i class="fa fa-plus smallbtn"></i></button>
+    <div class="row setline">
+        <div class="col-sm-{{ele.1}}"></div>
+        <div class="col-sm-2">
+            <a href="{{ele.0.location}}">{{ele.0.element}}</a> 
+        </div> 
+        <div class="col-sm-2 options">
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" location="{{ele.0.location}}" class="btn green" type="submit" onClick="addSite(this);">
+                <i class="fa fa-plus"></i>
+            </button>
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn red" type="submit" onClick="printMe(this);">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
     </div>
 {% endfor %}
 </div>
@@ -69,5 +139,128 @@ a {
     {{ele.0.element}}
     <br>
 {% endfor %}
+
+
+<script>
+
+function addSite(butn){
+    var popup = document.createElement('div');
+    popup.setAttribute('class', 'modal');
+
+    var inside_pop = document.createElement('div');
+    inside_pop.setAttribute('class', 'modal-content');
+
+    var header = document.createElement('h3');
+    header.innerText = "Add Sitemap";
+    inside_pop.append(header);
+    
+    var addForm = document.createElement('form');
+    addForm.method = "POST";
+    addForm.action = "addSite/";
+    
+    var elementInput = document.createElement('input');
+    elementInput.setAttribute("name","element");
+    elementInput.setAttribute("id", "ele-input");
+    elementInput.setAttribute("class", "form-control");
+    elementInput.setAttribute("type", "text");
+    var elementLabel = document.createElement("label");
+    elementLabel.setAttribute("for", "ele-input");
+    elementLabel.innerText = "Element Name: ";
+    var div1 = document.createElement("div");
+    div1.setAttribute("class", "form-group");
+    div1.appendChild(elementLabel);
+    div1.appendChild(elementInput);
+    addForm.appendChild(div1);
+    
+    var locationInput = document.createElement('input');
+    locationInput.setAttribute("name", "location");
+    locationInput.setAttribute("type", "url");
+    locationInput.setAttribute("id", "loc-input");
+    locationInput.setAttribute("class", "form-control");
+    locationInput.setAttribute("value", butn.getAttribute("location"));
+    var locationLabel = document.createElement('label');
+    locationLabel.setAttribute("for", "loc-input");
+    locationLabel.innerText = "URL Location: ";
+    var div2 = document.createElement("div");
+    div2.setAttribute("class", "form-group");
+    div2.appendChild(locationLabel);
+    div2.appendChild(locationInput);
+    addForm.appendChild(div2);
+
+    var parentInput = document.createElement("input");
+    parentInput.setAttribute("name", "parentDisplay");
+    parentInput.setAttribute("type", "text");
+    parentInput.setAttribute("id", "parent-ele-id");
+    parentInput.setAttribute("value", butn.getAttribute('text'));
+    parentInput.disabled = true;
+    var parentLabel = document.createElement("label");
+    parentLabel.setAttribute("for", "parent-ele-id");
+    parentLabel.innerText="Parent Element: ";
+    var div3 = document.createElement("div");
+    div3.setAttribute("class", "form-group");
+    div3.appendChild(parentLabel);
+    div3.appendChild(parentInput);
+    addForm.appendChild(div3);
+
+    var parentId = document.createElement("input");
+    parentId.setAttribute("name", "parent");
+    parentId.setAttribute("type", "number");
+    parentId.setAttribute("value", parseInt(butn.getAttribute('id')));
+    parentId.style.display = "none";
+    addForm.appendChild(parentId);
+
+    var requireLoginInput = document.createElement("input");
+    requireLoginInput.setAttribute("type", "checkbox");
+    requireLoginInput.setAttribute("name", "requireLogin");
+    requireLoginInput.setAttribute("id", "req-input");
+    var requireLoginLabel = document.createElement("label");
+    requireLoginLabel.setAttribute("for", "req-input");
+    requireLoginLabel.innerText = "Require Login: ";
+    var div34 = document.createElement("div");
+    div34.setAttribute("class", "form-group");
+    div34.appendChild(requireLoginLabel);
+    div34.appendChild(requireLoginInput);
+    addForm.appendChild(div34);
+
+    var commentInput = document.createElement("textarea");
+    commentInput.setAttribute("name", "comment");
+    commentInput.setAttribute("id", "comment-input");
+    addForm.appendChild(commentInput);
+    var commentLabel = document.createElement("label");
+    commentLabel.setAttribute("for", "comment-input");
+    commentLabel.innerText = "Comment: ";
+    var div4 = document.createElement("div");
+    div4.setAttribute("class", "form-group");
+    div4.appendChild(commentLabel);
+    div4.appendChild(commentInput);
+    addForm.appendChild(div4);
+
+
+    var saveButton = document.createElement("button");
+    saveButton.setAttribute("type", "submit");
+    saveButton.setAttribute("class", "btn btn-success");
+    saveButton.innerText = "Save";
+    addForm.appendChild(saveButton);
+
+    var cancelButton = document.createElement("button");
+    cancelButton.setAttribute("class", "btn btn-danger");
+    cancelButton.innerText = "Cancel";
+    cancelButton.onclick = function(){
+        document.body.removeChild(popup);
+    }
+    addForm.appendChild(cancelButton);
+    
+
+    inside_pop.appendChild(addForm);
+    popup.appendChild(inside_pop);
+
+    document.body.appendChild(popup);
+}
+
+function printMe(butn){
+    console.log(butn);
+}
+
+</script>
 
 {% endblock content %}
