@@ -1,11 +1,14 @@
-from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.shortcuts import render, redirect, reverse, get_object_or_404, HttpResponse
+from django.http import JsonResponse
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
 
 from .models import Site, Sitemap, Vulnerability
 from .forms import SiteFormset, SiteForm
+from .serializer import SitemapSerializer
 
 
 # Create your views here.
@@ -56,11 +59,11 @@ def findSubEle(ele):
 def sitemap_view(request, slug):
     site = get_object_or_404(Site, slug=slug)
     rootEle = get_object_or_404(Sitemap, element='/', site=site)
-    print('Went inside')
+    # print('Went inside')
     eleList=findSubEle(rootEle)
-    print('=============================')
-    print(eleList)
-    print('=============================')
+    # print('=============================')
+    # print(eleList)
+    # print('=============================')
     return render(request, 'mapper/SitemapView.html', {'eleList':eleList, 'site':site})
 
 @csrf_exempt
@@ -92,4 +95,27 @@ def deleteSitemap(request, slug):
         sitemap = get_object_or_404(Sitemap, pk=id)
         sitemap.delete()
         return redirect('mapper:sitemap', slug=slug)
-    
+
+def getSitemap(request, id):
+    if request.method == "GET":
+        sitemap = get_object_or_404(Sitemap, pk=id)
+        d = {'element':sitemap.element, 'location':sitemap.location, 'parent':sitemap.parent.element, 'require_login':sitemap.require_login, 'comment':sitemap.comment, 'parentpk':sitemap.parent.id}
+        return JsonResponse(d)
+
+@csrf_exempt
+def editSitemap(request, slug, id):
+    if request.method == "POST":
+        print(id)
+        print(request.POST)
+        element = request.POST.get('element')
+        location = request.POST.get('location')
+        comment = request.POST.get('comment')
+        reqLogin = request.POST.get('requireLogin')
+        print(element, location, comment, reqLogin)
+        s = get_object_or_404(Sitemap, pk=id)
+        s.element = element
+        s.location = location
+        s.comment = comment
+        s.require_login = bool(reqLogin)
+        s.save()
+        return redirect('mapper:sitemap', slug=slug)

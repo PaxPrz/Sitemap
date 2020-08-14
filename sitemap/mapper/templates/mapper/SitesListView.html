@@ -71,7 +71,7 @@ a {
     {% for s in sites %}
       <tr>
         <th scope="row">{{forloop.counter}}</th>
-        <td>{{s.site_name}}</td>
+        <td><a href="{% url 'mapper:sitemap' slug=s.slug %}">{{s.site_name}}</a></td>
         <td><a href={{s.site_location}}>{{s.site_location}}</a></td>
         <td> {% if s.is_active == True %}
                   <span style="color:green"> <i class="fa fa-font-awesome" style="color:green"></i> Alive </span>

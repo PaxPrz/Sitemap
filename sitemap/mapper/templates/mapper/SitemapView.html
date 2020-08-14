@@ -40,6 +40,13 @@ a {
     background-color:green;
 }
 
+.yellow{
+}
+
+.yellow:hover{
+    background-color:yellow;
+}
+
 .red{
 }
 
@@ -114,14 +121,28 @@ a {
     <div class="row setline">
         <div class="col-sm-{{ele.1}}"></div>
         <div class="col-sm-2">
-            <a href="{{ele.0.location}}">{{ele.0.element}}</a> 
+            <a href="{{ele.0.location}}" data-toggle="tooltip" data-placement="bottom" title="{{ele.0.comment}}">{{ele.0.element}}</a> 
         </div> 
+        <div style="width: 20px;">
+            {% if ele.0.require_login %}
+                {% comment %} <div class="tooltip">
+                    <i class="fa fa-user"></i>
+                    <span class="tooltiptext">
+                    Requires Login
+                    </span>
+                </div> {% endcomment %}
+                <i class="fa fa-user" data-toggle="tooltip" data-placement="top" title="Requires Login"></i>
+            {% endif %}
+        </div>
         <div class="col-sm-2 options">
-            <button id="{{ele.0.id}}" text="{{ele.0.element}}" location="{{ele.0.location}}" class="btn green" type="submit" onClick="addSite(this);">
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" location="{{ele.0.location}}" class="btn green" type="submit" onClick="addSite(this);"  data-toggle="tooltip" data-placement="top" title="add sublink">
                 <i class="fa fa-plus"></i>
             </button>
-            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn red" type="submit" onClick="deleteMe(this);">
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn red" type="submit" onClick="deleteMe(this);"  data-toggle="tooltip" data-placement="top" title="delete link">
                 <i class="fa fa-trash"></i>
+            </button>
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn yellow" type="submit" onClick="editMe(this);"  data-toggle="tooltip" data-placement="top" title="edit link">
+                <i class="fa fa-edit"></i>
             </button>
         </div>
     </div>
@@ -143,20 +164,10 @@ a {
 
 <script>
 
-function addSite(butn){
-    var popup = document.createElement('div');
-    popup.setAttribute('class', 'modal');
-
-    var inside_pop = document.createElement('div');
-    inside_pop.setAttribute('class', 'modal-content');
-
-    var header = document.createElement('h3');
-    header.innerText = "Add Sitemap";
-    inside_pop.append(header);
-    
+function generateForm(butn, link, popup){
     var addForm = document.createElement('form');
     addForm.method = "POST";
-    addForm.action = "addSite/";
+    addForm.action = link;
     
     var elementInput = document.createElement('input');
     elementInput.setAttribute("name","element");
@@ -205,6 +216,7 @@ function addSite(butn){
     var parentId = document.createElement("input");
     parentId.setAttribute("name", "parent");
     parentId.setAttribute("type", "number");
+    parentId.setAttribute("id", "par-id-num");
     parentId.setAttribute("value", parseInt(butn.getAttribute('id')));
     parentId.style.display = "none";
     addForm.appendChild(parentId);
@@ -249,7 +261,22 @@ function addSite(butn){
         document.body.removeChild(popup);
     }
     addForm.appendChild(cancelButton);
+
+    return addForm;
+}
+
+function addSite(butn){
+    var popup = document.createElement('div');
+    popup.setAttribute('class', 'modal');
+
+    var inside_pop = document.createElement('div');
+    inside_pop.setAttribute('class', 'modal-content');
+
+    var header = document.createElement('h3');
+    header.innerText = "Add Link";
+    inside_pop.append(header);
     
+    var addForm = generateForm(butn, 'addSite/', popup);
 
     inside_pop.appendChild(addForm);
     popup.appendChild(inside_pop);
@@ -272,6 +299,46 @@ function deleteMe(butn){
       myForm.submit();
       document.body.removeChild(myForm);
     }
+}
+
+function editMe(butn){
+    var popup = document.createElement('div');
+    popup.setAttribute('class', 'modal');
+
+    var inside_pop = document.createElement('div');
+    inside_pop.setAttribute('class', 'modal-content');
+
+    var header = document.createElement('h3');
+    header.innerText = "Edit Link";
+    inside_pop.append(header);
+    
+    var addForm = generateForm(butn, 'editSitemap/'+butn.getAttribute('id')+'/', popup);
+
+    var currentId = butn.getAttribute('id');
+
+    inside_pop.appendChild(addForm);
+    popup.appendChild(inside_pop);
+
+    document.body.appendChild(popup);
+
+    $.getJSON('/getSitemap/'+currentId+'/',
+        function (data, textStatus, jqXHR){
+            if (textStatus == "success"){
+                $('#ele-input').val(data.element);
+                $('#loc-input').val(data.location);
+                $('#parent-ele-id').val(data.parent);
+                $('#par-id-num').val(data.parentpk);
+                $('#req-input').prop('checked', data.require_login);
+                if(data.comment!=null){
+                    $('#comment-input').val(data.comment);
+                }
+                console.log('requireLogin: ', data.require_login);
+            }
+            else{
+                console.log("invalid data");
+            }
+        }
+    );
 }
 
 function printMe(butn){

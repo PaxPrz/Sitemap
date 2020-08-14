@@ -32,6 +32,7 @@ class Vulnerability(models.Model):
     request = models.CharField(max_length=1000, null=True, blank=True)
     is_reported = models.BooleanField(default=False)
     is_fixed = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.vulnerability
