@@ -120,7 +120,7 @@ a {
             <button id="{{ele.0.id}}" text="{{ele.0.element}}" location="{{ele.0.location}}" class="btn green" type="submit" onClick="addSite(this);">
                 <i class="fa fa-plus"></i>
             </button>
-            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn red" type="submit" onClick="printMe(this);">
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn red" type="submit" onClick="deleteMe(this);">
                 <i class="fa fa-trash"></i>
             </button>
         </div>
@@ -129,7 +129,7 @@ a {
 </div>
 
 
-{% for ele in eleList %}
+{% comment %} {% for ele in eleList %}
     {% if ele.1 != 0 %}
         {% for i in ele.1|rangelt1 %}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -138,7 +138,7 @@ a {
     {% endif %}
     {{ele.0.element}}
     <br>
-{% endfor %}
+{% endfor %} {% endcomment %}
 
 
 <script>
@@ -255,6 +255,23 @@ function addSite(butn){
     popup.appendChild(inside_pop);
 
     document.body.appendChild(popup);
+}
+
+function deleteMe(butn){
+    output = confirm("Do you want to delete "+String(butn.getAttribute("text")));
+    if(output == true){
+      var myForm = document.createElement("form");
+      myForm.method = "POST";
+      myForm.action = "deleteSitemap/";
+      myInput = document.createElement("input");
+      myInput.setAttribute("type", "number");
+      myInput.setAttribute("name", "id");
+      myInput.setAttribute("value", parseInt(butn.getAttribute("id")));
+      myForm.appendChild(myInput);
+      document.body.appendChild(myForm);
+      myForm.submit();
+      document.body.removeChild(myForm);
+    }
 }
 
 function printMe(butn){

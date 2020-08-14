@@ -84,3 +84,12 @@ def addSitemap(request, slug):
         Sitemap.objects.create(element=element, location=location, parent=parent, require_login=requireLogin, site=site, comment=comment)
 
         return redirect('mapper:sitemap', slug=slug)
+
+@csrf_exempt
+def deleteSitemap(request, slug):
+    if request.method == "POST":
+        id = int(request.POST.get('id'))
+        sitemap = get_object_or_404(Sitemap, pk=id)
+        sitemap.delete()
+        return redirect('mapper:sitemap', slug=slug)
+    

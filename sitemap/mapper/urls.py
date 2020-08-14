@@ -7,4 +7,5 @@ urlpatterns = [
     path('<slug:slug>/', views.sitemap_view, name='sitemap'),
     path('delete_site/', views.delete_site, name='deletesite'),
     path('<slug:slug>/addSite/', views.addSitemap, name="addSitemap"),
+    path('<slug:slug>/deleteSitemap/', views.deleteSitemap, name="deleteSitemap"),
 ]
