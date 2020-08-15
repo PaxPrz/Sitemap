@@ -58,7 +58,7 @@ def findSubEle(ele):
 
 def sitemap_view(request, slug):
     site = get_object_or_404(Site, slug=slug)
-    rootEle = get_object_or_404(Sitemap, element='/', site=site)
+    rootEle = get_object_or_404(Sitemap, element='/', site=site, parent=None)
     # print('Went inside')
     eleList=findSubEle(rootEle)
     # print('=============================')
@@ -119,3 +119,5 @@ def editSitemap(request, slug, id):
         s.require_login = bool(reqLogin)
         s.save()
         return redirect('mapper:sitemap', slug=slug)
+
+# def addVulnerability(request, slug, id):
