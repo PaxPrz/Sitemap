@@ -26,13 +26,22 @@ class Sitemap(models.Model):
     def __str__(self):
         return self.element
 
+VULN_CATEGORIES = (
+    ('Critical', 'CRITICAL'),
+    ('High', 'HIGH'),
+    ('Medium', 'MEDIUM'),
+    ('Low', 'LOW'),
+    ('Informational', 'INFORMATIONAL'),
+)
+
 class Vulnerability(models.Model):
     sitemap = models.ForeignKey(Sitemap, on_delete=models.CASCADE)
     vulnerability = models.CharField(max_length=100)
     request = models.CharField(max_length=1000, null=True, blank=True)
     is_reported = models.BooleanField(default=False)
     is_fixed = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    category = models.CharField(max_length=15, choices=VULN_CATEGORIES, default='Low', null=True)
 
     def __str__(self):
         return self.vulnerability

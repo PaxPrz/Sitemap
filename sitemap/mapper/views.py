@@ -120,4 +120,10 @@ def editSitemap(request, slug, id):
         s.save()
         return redirect('mapper:sitemap', slug=slug)
 
+def getVulnerability(request, slug, id):
+    if request.method == "GET":
+        sitemap = get_object_or_404(Sitemap, pk=id)
+        vulnerability = sitemap.vulnerability_set.all()
+        return JsonResponse(serializers.serialize('json', vulnerability), safe=False)
+
 # def addVulnerability(request, slug, id):

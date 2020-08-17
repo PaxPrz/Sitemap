@@ -54,6 +54,13 @@ a {
     background-color:red;
 }
 
+.blue{
+}
+
+.blue:hover{
+    background-color:blue;
+}
+
 .setline{
     line-height: 30px;
     margin: 4px 0px;
@@ -134,15 +141,18 @@ a {
                 <i class="fa fa-user" data-toggle="tooltip" data-placement="top" title="Requires Login"></i>
             {% endif %}
         </div>
-        <div class="col-sm-2 options">
+        <div class="col-sm-3 options">
             <button id="{{ele.0.id}}" text="{{ele.0.element}}" location="{{ele.0.location}}" class="btn green" type="submit" onClick="addSite(this);"  data-toggle="tooltip" data-placement="top" title="add sublink">
                 <i class="fa fa-plus"></i>
             </button>
             <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn red" type="submit" onClick="deleteMe(this);"  data-toggle="tooltip" data-placement="top" title="delete link">
                 <i class="fa fa-trash"></i>
             </button>
-            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn yellow" type="submit" onClick="editMe(this);"  data-toggle="tooltip" data-placement="top" title="edit link">
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn blue" type="submit" onClick="editMe(this);"  data-toggle="tooltip" data-placement="top" title="edit link">
                 <i class="fa fa-edit"></i>
+            </button>
+            <button id="{{ele.0.id}}" text="{{ele.0.element}}" class="btn yellow" type="submit" onClick="getVulnerability(this);"  data-toggle="tooltip" data-placement="top" title="Vulnerabilities">
+                <i class="fa fa-bug"></i>
             </button>
         </div>
     </div>
@@ -336,6 +346,65 @@ function editMe(butn){
             }
             else{
                 console.log("invalid data");
+            }
+        }
+    );
+}
+
+function getVulnerability(butn){
+    var currentId = butn.getAttribute('id');
+    var popup = document.createElement('div');
+    popup.setAttribute('id', 'pop-up');
+    popup.setAttribute('class', 'modal');
+
+    var inside_pop = document.createElement('div');
+    inside_pop.setAttribute('class', 'modal-content');
+
+    var header = document.createElement('h3');
+    header.innerText = "Vulnerabilities in "+ butn.getAttribute('text');
+    inside_pop.append(header);
+    
+    //var addForm = generateForm(butn, 'editSitemap/'+butn.getAttribute('id')+'/', popup);
+
+    $(`<table class="table">
+        <thead>
+            <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Vulnerability</th>
+            <th scope="col">is_reported</th>
+            <th scope="col">is_fixed</th>
+            <th scope="col">Buttons</th>
+            </tr>
+        </thead>
+        <tbody id="vulnBody">
+            
+        </tbody>
+        </table>
+        <button class="btn btn-danger" onclick="document.body.removeChild(document.getElementById('pop-up'));">Close</button>`)
+        .appendTo(inside_pop);
+
+
+    popup.appendChild(inside_pop);
+
+    document.body.appendChild(popup);
+
+    $.getJSON(currentId+'/getVulnerability/',
+        function(data, textStatus, jqHXR){
+            if(textStatus == "success"){
+                console.log(data);
+                data = JSON.parse(data);
+                for(var i=0; i<data.length; i++){
+                    console.log('loop: '+String(i));
+                    var d = new Date(data[i]['fields']['timestamp']);
+                    var df = String(d.getMonth())+'/'+String(d.getDate())+' - '+String(d.getHours())+':'+String(d.getMinutes());
+                    $(`<tr>
+                        <th scope="row">`+df+`</th>
+                        <td>`+data[i]['fields']['vulnerability']+`</td>
+                        <td>`+data[i]['fields']['is_reported']+`</td>
+                        <td>`+data[i]['fields']['is_fixed']+`</td>
+                        <td><button class="btn btn-warning">Open</button></td>
+                    </tr>`).appendTo($('#vulnBody'));
+                }
             }
         }
     );
