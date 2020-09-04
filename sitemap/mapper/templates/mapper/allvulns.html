@@ -1,0 +1,34 @@
+{% extends 'sitemap/base.html' %}
+
+{% load myfilters %}
+
+{% block title %}All Vulnerabilities
+{% endblock title %}
+
+{% block content %}
+    <h1>All vulnerabilites</h1>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Vulnerability</th>
+      <th scope="col">Request</th>
+      <th scope="col">Reported</th>
+      <th scope="col">Fixed</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for v in allv %}
+    <tr>
+      <th scope="row">{{ forloop.counter }}</th>
+      <td>{{v.vulnerability}}</td>
+      <td>{{v.request}}</td>
+      <td>{{v.is_reported}}</td>
+      <td>{{v.is_fixed}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock content %}
+

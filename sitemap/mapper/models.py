@@ -36,7 +36,7 @@ VULN_CATEGORIES = (
 
 class Vulnerability(models.Model):
     sitemap = models.ForeignKey(Sitemap, on_delete=models.CASCADE)
-    vulnerability = models.CharField(max_length=100)
+    vulnerability = models.CharField(max_length=300)
     request = models.CharField(max_length=1000, null=True, blank=True)
     is_reported = models.BooleanField(default=False)
     is_fixed = models.BooleanField(default=False)

@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 
 from .models import Site, Sitemap, Vulnerability
-from .forms import SiteFormset, SiteForm
+from .forms import SiteFormset, SiteForm, VulnerabilityForm
 from .serializer import SitemapSerializer
 
 
@@ -126,4 +126,66 @@ def getVulnerability(request, slug, id):
         vulnerability = sitemap.vulnerability_set.all()
         return JsonResponse(serializers.serialize('json', vulnerability), safe=False)
 
-# def addVulnerability(request, slug, id):
+def getVulnForm(request):
+    if request.method == "GET":
+        vuln = VulnerabilityForm()
+        return render(request, 'mapper/vulnform.html', {"form":vuln})
+    elif request.method == "POST":
+        print(request.POST)
+        vuln = VulnerabilityForm(request.POST)
+        if vuln.is_valid():
+            print("VALID FORM")
+        else:
+            print("INVALID FORM")
+        return render(request, 'mapper/vulnform.html', {"form":vuln})
+
+@csrf_exempt
+def addVulnerability(request, slug, id):
+    if request.method == "GET":
+        vuln = VulnerabilityForm()
+        return JsonResponse({"form":vuln.as_p()})
+    elif request.method == "POST":
+        vuln = VulnerabilityForm(request.POST)
+        if vuln.is_valid():
+            print('vulnform valid')
+            v = vuln.save(commit=False)
+            v.sitemap = get_object_or_404(Sitemap, pk=id)
+            v.save()
+        else:
+            print('forminvalid')
+        return redirect('mapper:sitemap', slug=slug)
+
+def getOneVuln(request, slug):
+    if request.method == "GET":
+        id = request.GET.get('id')
+        vuln = get_object_or_404(Vulnerability, pk=id)
+        if vuln:
+            return JsonResponse({
+                'id': vuln.id,
+                'vulnerability': vuln.vulnerability,
+                'request': vuln.request,
+                'is_reported': vuln.is_reported,
+                'is_fixed': vuln.is_fixed,
+                'category': vuln.category
+            })
+        return JsonResponse({'message':'not found'})
+
+@csrf_exempt
+def editOneVuln(request, slug, vulnId):
+    if request.method == "POST":
+        vuln = get_object_or_404(Vulnerability, pk=int(vulnId))
+        vuln.vulnerability = request.POST.get('vulnerability')
+        vuln.request = request.POST.get('request')
+        vuln.is_reported = True if request.POST.get('is_reported') else False
+        vuln.is_fixed = True if request.POST.get('is_fixed') else False
+        vuln.category = request.POST.get('category')
+        vuln.save()
+    return redirect('mapper:sitemap', slug=slug)
+
+def allVulnerability(request, slug):
+    if request.method == "GET":
+        site = get_object_or_404(Site, slug=slug)
+        allv = []
+        for s in site.sitemap_set.all():
+            allv += s.vulnerability_set.all()
+        return render(request, 'mapper/allvulns.html', {'allv':allv})
